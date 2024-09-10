@@ -17,6 +17,7 @@ class RecintosZoo {
             HIPOPOTAMO: { tamanho: 4, biomas: ['savana', 'rio'], carnivoro: false },
         };
     }
+
     analisaRecintos(animal, quantidade) {
         if (!this.animais[animal]) {
             return { erro: "Animal inválido", recintosViaveis: false };
@@ -29,9 +30,7 @@ class RecintosZoo {
         const animalInfo = this.animais[animal];
         const recintosViaveis = [];
 
-        // Iterando sobre cada recinto para verificar se é viável
         for (const recinto of this.recintos) {
-            // Verificando se o bioma é compatível
             if (!animalInfo.biomas.includes(recinto.bioma) && !(animalInfo.biomas.includes('savana') && recinto.bioma === 'savana e rio')) {
                 continue;
             }
@@ -41,7 +40,6 @@ class RecintosZoo {
             let temHerbivoro = false;
             let maisDeUmaEspecie = false;
 
-            // Verificando os animais existentes no recinto
             for (const animalExistente of recinto.animaisExistentes) {
                 const infoAnimalExistente = this.animais[animalExistente.especie];
                 espacoOcupado += animalExistente.quantidade * infoAnimalExistente.tamanho;
@@ -52,15 +50,13 @@ class RecintosZoo {
                     temHerbivoro = true;
                 }
 
-                // Hipopótamos e outros animais no recinto
                 if (animalExistente.especie !== animal && animal === 'HIPOPOTAMO' && recinto.bioma !== 'savana e rio') {
-                    espacoOcupado = recinto.tamanhoTotal + 1; // Recinto inviável
+                    espacoOcupado = recinto.tamanhoTotal + 1;
                     break;
                 }
 
-                // Macacos não se sentem confortáveis sozinhos em um recinto vazio
-                if (animal === 'MACACO' && recinto.animaisExistentes.length === 0) {??
-                    espacoOcupado = recinto.tamanhoTotal + 1; // Recinto inviável
+                if (animal === 'MACACO' && recinto.animaisExistentes.length === 0) {
+                    espacoOcupado = recinto.tamanhoTotal + 1;
                     break;
                 }
 
@@ -69,39 +65,31 @@ class RecintosZoo {
                 }
             }
 
-             // Se o recinto já tem um carnívoro e o novo animal é diferente, o recinto é inviável
-             if (temCarnivoro && !animalInfo.carnivoro) {
+            if (temCarnivoro && !animalInfo.carnivoro) {
                 continue;
             }
 
-            // Se o recinto já tem um herbívoro e o novo animal é carn?ívoro, o recinto é inviável
             if (temHerbivoro && animalInfo.carnivoro) {
                 continue;
             }
 
-            // Adicionando o espaço do novo animal
             espacoOcupado += quantidade * animalInfo.tamanho;
 
-            // Considerando o espaço extra caso haja mais de uma espécie
             if (maisDeUmaEspecie) {
                 espacoOcupado += 1;
             }
 
-            // Verificando se há espaço suficiente no recinto
             if (espacoOcupado <= recinto.tamanhoTotal) {
                 recintosViaveis.push(`Recinto ${recinto.numero} (espaço livre: ${recinto.tamanhoTotal - espacoOcupado} total: ${recinto.tamanhoTotal})`);
             }
         }
 
-        // Retornando o resultado final
         if (recintosViaveis.length > 0) {
             return { erro: false, recintosViaveis: recintosViaveis.sort((a, b) => parseInt(a.split(' ')[1]) - parseInt(b.split(' ')[1])) };
         } else {
             return { erro: "Não há recinto viável", recintosViaveis: false };
         }
-
     }
-
 }
 
 export { RecintosZoo as RecintosZoo };
