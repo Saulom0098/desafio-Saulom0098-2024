@@ -25,6 +25,50 @@ class RecintosZoo {
         if (quantidade <= 0) {
             return { erro: "Quantidade inválida", recintosViaveis: false };
         }
+
+        const animalInfo = this.animais[animal];
+        const recintosViaveis = [];
+
+        // Iterando sobre cada recinto para verificar se é viável
+        for (const recinto of this.recintos) {
+            // Verificando se o bioma é compatível
+            if (!animalInfo.biomas.includes(recinto.bioma) && !(animalInfo.biomas.includes('savana') && recinto.bioma === 'savana e rio')) {
+                continue;
+            }
+
+            let espacoOcupado = 0;
+            let temCarnivoro = false;
+            let temHerbivoro = false;
+            let maisDeUmaEspecie = false;
+
+            // Verificando os animais existentes no recinto
+            for (const animalExistente of recinto.animaisExistentes) {
+                const infoAnimalExistente = this.animais[animalExistente.especie];
+                espacoOcupado += animalExistente.quantidade * infoAnimalExistente.tamanho;
+
+                if (infoAnimalExistente.carnivoro) {
+                    temCarnivoro = true;
+                } else {
+                    temHerbivoro = true;
+                }
+
+                // Hipopótamos e outros animais no recinto
+                if (animalExistente.especie !== animal && animal === 'HIPOPOTAMO' && recinto.bioma !== 'savana e rio') {
+                    espacoOcupado = recinto.tamanhoTotal + 1; // Recinto inviável
+                    break;
+                }
+
+                // Macacos não se sentem confortáveis sozinhos em um recinto vazio
+                if (animal === 'MACACO' && recinto.animaisExistentes.length === 0) {??
+                    espacoOcupado = recinto.tamanhoTotal + 1; // Recinto inviável
+                    break;
+                }
+
+                if (recinto.animaisExistentes.length > 1 || (recinto.animaisExistentes.length === 1 && animalExistente.especie !== animal)) {
+                    maisDeUmaEspecie = true;
+                }
+            }
+
     }
 
 }
